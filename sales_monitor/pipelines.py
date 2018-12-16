@@ -10,5 +10,5 @@ class CollectionStoragePipeline(object):
         self.dynamoDbUtils = DynamoDbUtils()
 
     def process_item(self, item, spider):
-        self.dynamoDbUtils.add_items(settings.DYNAMODB_PIPELINE_TABLE_NAME, item.items())
+        self.dynamoDbUtils.add_items(settings.DYNAMODB_PRODUCT_TABLE_NAME, item.items())
         return item

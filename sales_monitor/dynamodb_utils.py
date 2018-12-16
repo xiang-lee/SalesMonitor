@@ -1,6 +1,7 @@
 import datetime
 
 import boto3
+from boto3.dynamodb.conditions import Key
 
 from sales_monitor import settings
 
@@ -32,3 +33,16 @@ class DynamoDbUtils(object):
             TableName=table_name,
             Item={k: self.encoder(v) for k, v in items},
         )
+
+    def get_items_newer_than(self, table_name, product_name, since_epoch_time):
+        table = self.db.Table(table_name)
+        filtering_exp = Key('product_name').eq(product_name) & Key('epoch_time').gt(since_epoch_time)
+        response = table.scan(FilterExpression=filtering_exp)
+        items = response['Items']
+        while True:
+            if response.get('LastEvaluatedKey'):
+                response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+                items += response['Items']
+            else:
+                break
+        return items
