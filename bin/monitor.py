@@ -14,31 +14,31 @@ jinja_env = Environment(loader=PackageLoader('sales_monitor', 'templates'))
 CHARSET = "UTF-8"
 
 
-class DealsChecker(object):
+class ProductsChecker(object):
 
-    def __init__(self, latest_deals, previous_deals, price_threshold=0):
+    def __init__(self, latest_products, previous_products, price_threshold=0):
         self.price_threshold = price_threshold
-        self.latest_deals = latest_deals
-        self.previous_deals = previous_deals
+        self.latest_products = latest_products
+        self.previous_products = previous_products
 
-    def is_from_latest_crawl(self, deal):
-        """Checks whether the given deal is from the most recent execution.
+    def is_from_latest_crawl(self, product):
+        """Checks whether the given product is from the most recent execution.
         """
-        return deal in self.latest_deals
+        return product in self.latest_products
 
-    def get_best_deal(self):
+    def get_best_product(self):
         """Returns the item with the best overall price. self.price_threshold can be set to avoid
            considering minor price drops.
         """
-        best_so_far = min(self.previous_deals, key=lambda x: x.get('price'))
-        best_from_last = min(self.latest_deals, key=lambda x: x.get('price'))
+        best_so_far = min(self.previous_products, key=lambda x: x.get('price'))
+        best_from_last = min(self.latest_products, key=lambda x: x.get('price'))
         if best_from_last.get('price') + self.price_threshold <= best_so_far.get('price'):
             return best_from_last
         else:
             return best_so_far
 
 
-class DealsFetcher(object):
+class ProductsFetcher(object):
 
     def __init__(self, product_name, apikey, project_id, hours):
         self.product_name = product_name
@@ -50,43 +50,43 @@ class DealsFetcher(object):
         """Load items from the last n hours, from the newest to the oldest.
         """
         since_time = int((datetime.now() - timedelta(hours=n)).timestamp() * 1000)
-        self.deals = [item.get('value') for item in self.fetch_deals_newer_than(since_time)]
+        self.products = [item.get('value') for item in self.fetch_products_newer_than(since_time)]
 
-    def fetch_deals_newer_than(self, since_time):
+    def fetch_products_newer_than(self, since_time):
         return list(self.item_store.iter(startts=since_time))
 
-    def get_latest_deal_from_retailer(self, retailer):
-        """Returns the most recently extracted deal from a given retailer.
+    def get_latest_product_from_retailer(self, retailer):
+        """Returns the most recently extracted product from a given retailer.
         """
-        for deals in self.deals:
-            if retailer in deals.get('url'):
-                return deals
+        for products in self.products:
+            if retailer in products.get('url'):
+                return products
 
-    def get_deals(self):
-        """Returns a tuple with (deals from latest crawl, deals from previous crawls)
+    def get_products(self):
+        """Returns a tuple with (products from latest crawl, products from previous crawls)
         """
-        latest_deals = [
-            self.get_latest_deal_from_retailer(retailer)
+        latest_products = [
+            self.get_latest_product_from_retailer(retailer)
             for retailer in get_retailers_for_product(self.product_name)
         ]
-        previous_deals = [
-            deal for deal in self.deals if deal not in latest_deals
+        previous_products = [
+            product for product in self.products if product not in latest_products
         ]
 
-        print('latest_deals = ', latest_deals)
-        print('previous_deals = ', previous_deals)
+        print('latest_products = ', latest_products)
+        print('previous_products = ', previous_products)
 
-        return latest_deals, previous_deals
+        return latest_products, previous_products
 
 
 def main(args):
     items = []
     for prod_name in get_product_names():
-        fetcher = DealsFetcher(prod_name, args.apikey, args.project, args.days * 24)
-        checker = DealsChecker(*fetcher.get_deals(), args.threshold)
-        best_deal = checker.get_best_deal()
-        if checker.is_from_latest_crawl(best_deal):
-            items.append(best_deal)
+        fetcher = ProductsFetcher(prod_name, args.apikey, args.project, args.days * 24)
+        checker = ProductsChecker(*fetcher.get_products(), args.threshold)
+        best_product = checker.get_best_product()
+        if checker.is_from_latest_crawl(best_product):
+            items.append(best_product)
     if items:
         send_email_alert(items)
 
