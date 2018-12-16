@@ -6,9 +6,9 @@ from email.mime.text import MIMEText
 import sys
 from jinja2 import Environment, PackageLoader
 
-from price_monitor import settings
+from sales_monitor import settings
 
-jinja_env = Environment(loader=PackageLoader('price_monitor', 'templates'))
+jinja_env = Environment(loader=PackageLoader('sales_monitor', 'templates'))
 SUBJECT = 'Price drop alert'
 
 

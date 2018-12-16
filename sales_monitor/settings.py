@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
 
-BOT_NAME = 'price_monitor'
-SPIDER_MODULES = ['price_monitor.spiders']
-NEWSPIDER_MODULE = 'price_monitor.spiders'
+BOT_NAME = 'sales_monitor'
+SPIDER_MODULES = ['sales_monitor.spiders']
+NEWSPIDER_MODULE = 'sales_monitor.spiders'
 
 ROBOTSTXT_OBEY = True
 
@@ -19,7 +19,7 @@ EMAIL_ALERT_TO = ['xiangireland@gmail.com']
 
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'price_monitor.pipelines.CollectionStoragePipeline': 400,
+    'sales_monitor.pipelines.CollectionStoragePipeline': 400,
 }
 
 AUTOTHROTTLE_ENABLED = True

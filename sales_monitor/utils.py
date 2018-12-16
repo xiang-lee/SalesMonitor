@@ -19,7 +19,7 @@ def get_product_names():
     return [
         normalize_name(name)
         for name in json.loads(
-            pkgutil.get_data("price_monitor", "resources/urls.json").decode()
+            pkgutil.get_data("sales_monitor", "resources/urls.json").decode()
         ).keys()
     ]
 
@@ -30,6 +30,6 @@ def get_retailer_name_from_url(url):
 
 def get_retailers_for_product(product_name):
     data = json.loads(
-        pkgutil.get_data("price_monitor", "resources/urls.json").decode()
+        pkgutil.get_data("sales_monitor", "resources/urls.json").decode()
     )
     return {get_retailer_name_from_url(url) for url in data[product_name]}

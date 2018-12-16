@@ -7,7 +7,7 @@ from datetime import datetime
 class BaseSpider(scrapy.Spider):
 
     def start_requests(self):
-        products = json.loads(pkgutil.get_data('price_monitor', 'resources/urls.json').decode())
+        products = json.loads(pkgutil.get_data('sales_monitor', 'resources/urls.json').decode())
         for name, urls in products.items():
             for url in urls:
                 if self.name in url:

@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 from jinja2 import Environment, PackageLoader
 from scrapinghub import ScrapinghubClient
 
-from price_monitor import settings
-from price_monitor.email_utils import send_email_alert
-from price_monitor.utils import get_product_names, get_retailers_for_product
+from sales_monitor import settings
+from sales_monitor.email_utils import send_email_alert
+from sales_monitor.utils import get_product_names, get_retailers_for_product
 
-jinja_env = Environment(loader=PackageLoader('price_monitor', 'templates'))
+jinja_env = Environment(loader=PackageLoader('sales_monitor', 'templates'))
 
 CHARSET = "UTF-8"
 

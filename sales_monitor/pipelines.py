@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-from price_monitor import settings
+from sales_monitor import settings
 
 
 def default_encoder(value):
