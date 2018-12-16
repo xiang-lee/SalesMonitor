@@ -1,21 +1,61 @@
 # -*- coding: utf-8 -*-
+import datetime
+
+import boto3
+
 from price_monitor import settings
-from scrapinghub import ScrapinghubClient
-from price_monitor.utils import reversed_timestamp, get_product_names
+
+
+def default_encoder(value):
+    if isinstance(value, datetime.datetime):
+        return value.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(value, datetime.date):
+        return value.strftime('%Y-%m-%d')
+    elif isinstance(value, datetime.time):
+        return value.strftime('%H:%M:%S')
+    else:
+        return value
 
 
 class CollectionStoragePipeline(object):
 
+    def __init__(self, aws_access_key_id, aws_secret_access_key, region_name,
+                 table_name, encoder=default_encoder):
+        self.aws_access_key_id = aws_access_key_id
+        self.aws_secret_access_key = aws_secret_access_key
+        self.region_name = region_name
+        self.table_name = table_name
+        self.encoder = encoder
+        self.table = None
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        aws_access_key_id = settings.AWS_ACCESS_KEY
+        aws_secret_access_key = settings.AWS_SECRET_KEY
+        region_name = settings.DYNAMODB_PIPELINE_REGION_NAME
+        table_name = settings.DYNAMODB_PIPELINE_TABLE_NAME
+        return cls(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            region_name=region_name,
+            table_name=table_name
+        )
+
     def open_spider(self, spider):
-        client = ScrapinghubClient(auth=settings.SHUB_KEY)
-        project = client.get_project(settings.SHUB_PROJ_ID)
-        self.data_stores = {}
-        for product_name in get_product_names():
-            self.data_stores[product_name] = project.collections.get_store(product_name)
+        db = boto3.resource(
+            'dynamodb',
+            aws_access_key_id=self.aws_access_key_id,
+            aws_secret_access_key=self.aws_secret_access_key,
+            region_name=self.region_name,
+        )
+        self.table = db.Table(self.table_name)
+
+    def close_spider(self, spider):
+        self.table = None
 
     def process_item(self, item, spider):
-        key = "{}-{}-{}".format(
-            reversed_timestamp(), item.get('product_name'), item.get('retailer')
+        self.table.put_item(
+            TableName=self.table_name,
+            Item={k: self.encoder(v) for k, v in item.items()},
         )
-        self.data_stores[item['product_name']].set({'_key': key, 'value': item})
         return item

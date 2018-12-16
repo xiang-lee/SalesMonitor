@@ -58,9 +58,6 @@ class DealsFetcher(object):
     def get_latest_deal_from_retailer(self, retailer):
         """Returns the most recently extracted deal from a given retailer.
         """
-        print('xiang---')
-        print("retailer = ", retailer)
-        print(self.deals)
         for deals in self.deals:
             if retailer in deals.get('url'):
                 return deals

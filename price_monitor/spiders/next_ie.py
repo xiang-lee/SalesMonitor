@@ -1,3 +1,5 @@
+from _decimal import Decimal
+
 from .base_spider import BaseSpider
 
 
@@ -15,6 +17,6 @@ class NextIeSpider(BaseSpider):
         print(price_string)
 
         price = price_string.split('-')[0].strip()
-        item['price'] = float(price)
+        item['price'] = Decimal(price)
 
         yield item
