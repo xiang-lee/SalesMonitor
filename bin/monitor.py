@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from jinja2 import Environment, PackageLoader
 
-from sales_monitor import settings
+from sales_monitor import settings, email_utils
 from sales_monitor.dynamodb_utils import DynamoDbUtils
 from sales_monitor.utils import get_product_names, get_retailers_for_product
 
@@ -63,6 +63,7 @@ class ProductsFetcher(object):
         for products in sorted_products:
             if retailer in products.get('url'):
                 return products
+        return []
 
     def get_products(self):
         """Returns a tuple with (products from latest crawl, products from previous crawls)
@@ -89,7 +90,7 @@ def main(args):
     if items:
         print('sale!')
         print('items on sale: ', items)
-        # send_email_alert(items)
+        email_utils.send_email_alert(items)
     else:
         print('not sale!')
 

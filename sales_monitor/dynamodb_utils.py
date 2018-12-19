@@ -24,7 +24,7 @@ class DynamoDbUtils(object):
             'dynamodb',
             aws_access_key_id=settings.AWS_ACCESS_KEY,
             aws_secret_access_key=settings.AWS_SECRET_KEY,
-            region_name=settings.DYNAMODB_PIPELINE_REGION_NAME,
+            region_name=settings.REGION_NAME,
         )
 
     def add_items(self, table_name, items):
