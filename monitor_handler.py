@@ -1,6 +1,4 @@
-import argparse
 import calendar
-from _decimal import Decimal
 from _operator import itemgetter
 from datetime import datetime, timedelta
 
@@ -78,31 +76,26 @@ class ProductsFetcher(object):
         return latest_products, previous_products
 
 
-def main(args):
+def check_and_notify(threshold, days):
     items = []
-    args.threshold = Decimal(args.threshold)
     for prod_name in get_product_names():
-        fetcher = ProductsFetcher(prod_name, args.days * 24)
-        checker = ProductsChecker(*fetcher.get_products(), args.threshold)
+        fetcher = ProductsFetcher(prod_name, days * 24)
+        checker = ProductsChecker(*fetcher.get_products(), threshold)
         best_product = checker.get_best_product()
         if checker.is_from_latest_crawl(best_product):
             items.append(best_product)
     if items:
-        print('sale!')
+        print('sale!123')
         print('items on sale: ', items)
         email_utils.send_email_alert(items)
     else:
         print('not sale!')
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--days', type=int, default=1,
-                        help='How many days back to compare with the last price')
-    parser.add_argument('--threshold', type=float, default=0,
-                        help='A margin to avoid raising alerts with minor price drops')
-    return parser.parse_args()
+def main(event, context):
+    check_and_notify(event['threshold'], event['days'])
 
 
 if __name__ == '__main__':
-    main(parse_args())
+    event = {'threshold': 1, 'days': 3}
+    main(event, '')
