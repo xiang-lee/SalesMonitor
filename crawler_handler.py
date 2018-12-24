@@ -1,18 +1,24 @@
 import logging
-from subprocess import Popen
+from datetime import datetime
+
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+
+import monitor_handler
+from sales_monitor.spiders.next_ie import NextIeSpider
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
 def main(event, context):
-    store_name = event['store_name']
-    log.info('starting crawl: ' + store_name)
-    print('print starting crawl: ', store_name)
-    process = Popen(['scrapy', 'crawl', event['store_name']])
-    process.communicate()
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(NextIeSpider)
+    process.start()  # the script will block here until the crawling is finished
+    print('Finish crawler', event['store_name'], datetime.now())
+    monitor_handler.main(event, context)
 
 
 if __name__ == "__main__":
-    event = {'store_name': 'next.ie'}
+    event = {'store_name': 'next.ie', 'threshold': 1, 'hours': 12}
     main(event, '')

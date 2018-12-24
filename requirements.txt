@@ -4,3 +4,4 @@ botocore==1.12.66
 extruct==0.7.1
 w3lib==1.19.0
 jinja2==2.10
+project==20

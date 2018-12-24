@@ -76,26 +76,26 @@ class ProductsFetcher(object):
         return latest_products, previous_products
 
 
-def check_and_notify(threshold, days):
+def check_and_notify(threshold, hours):
+    print('---start check_and_notify----', datetime.now())
     items = []
     for prod_name in get_product_names():
-        fetcher = ProductsFetcher(prod_name, days * 24)
+        fetcher = ProductsFetcher(prod_name, hours)
         checker = ProductsChecker(*fetcher.get_products(), threshold)
         best_product = checker.get_best_product()
         if checker.is_from_latest_crawl(best_product):
             items.append(best_product)
     if items:
-        print('sale!123')
-        print('items on sale: ', items)
+        print('Sale!. Items on sale: ', items)
         email_utils.send_email_alert(items)
     else:
         print('not sale!')
 
 
 def main(event, context):
-    check_and_notify(event['threshold'], event['days'])
+    check_and_notify(event['threshold'], event['hours'])
 
 
 if __name__ == '__main__':
-    event = {'threshold': 1, 'days': 3}
+    event = {'threshold': 1, 'hours': 1}
     main(event, '')
