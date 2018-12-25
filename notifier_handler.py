@@ -92,10 +92,12 @@ def check_and_notify(threshold, hours):
         print('not sale!')
 
 
-def main(event, context):
-    check_and_notify(event['threshold'], event['hours'])
+def handler(event, context):
+    threshold = 1
+    hours = 1
+    check_and_notify(threshold, hours)
 
 
 if __name__ == '__main__':
     event = {'threshold': 1, 'hours': 1}
-    main(event, '')
+    handler(event, '')
